@@ -14,55 +14,60 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd)
 {
-	HANDLE hStore, hPartFirst, hPart;
-	LPCTSTR Store = L"DSK2:";
-	PARTINFO PartInfo = { 0 };
-	PartInfo.cbSize = sizeof(PARTINFO);
+    HANDLE hStore, hPartFirst, hPart;
+    LPCTSTR Store = L"DSK2:";
+    PARTINFO PartInfo = {0};
+    PartInfo.cbSize = sizeof(PARTINFO);
 
-	HMODULE hlib = LoadLibrary(L"coredll.dll");
+    HMODULE hlib = LoadLibrary(L"coredll.dll");
 
-	if ( !hlib ) {
-		debug(L"Coredll.dll", L"Could not open coredll.dll library.\nError code: %d", GetLastError());
-		return ERROR_INVALID_HANDLE;
-	}
+    if (!hlib)
+    {
+        debug(L"Coredll.dll", L"Could not open coredll.dll library.\nError code: %d", GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
-	OpenStoreProc OpenStore = (OpenStoreProc) GetProcAddress(hlib, L"OpenStore");
-	FindFirstPartitionProc FindFirstPartition = (FindFirstPartitionProc) GetProcAddress(hlib, L"FindFirstPartition");
-	OpenPartitionProc OpenPartition = (OpenPartitionProc) GetProcAddress(hlib, L"OpenPartition");
-	MountPartitionProc MountPartition = (MountPartitionProc) GetProcAddress(hlib, L"MountPartition");
+    OpenStoreProc OpenStore = (OpenStoreProc)GetProcAddress(hlib, L"OpenStore");
+    FindFirstPartitionProc FindFirstPartition = (FindFirstPartitionProc)GetProcAddress(hlib, L"FindFirstPartition");
+    OpenPartitionProc OpenPartition = (OpenPartitionProc)GetProcAddress(hlib, L"OpenPartition");
+    MountPartitionProc MountPartition = (MountPartitionProc)GetProcAddress(hlib, L"MountPartition");
 
-	if ( !OpenStore || !FindFirstPartition || !MountPartition ) {
-		debug(L"Coredll.dll", L"Could not load functions from coredll.dll.\nError code: %d", GetLastError());
-		return ERROR_INVALID_HANDLE;
-	}
+    if (!OpenStore || !FindFirstPartition || !MountPartition)
+    {
+        debug(L"Coredll.dll", L"Could not load functions from coredll.dll.\nError code: %d", GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
-	hStore = OpenStore(Store);
+    hStore = OpenStore(Store);
 
-	if ( hStore == INVALID_HANDLE_VALUE ) {
-		debug(L"OpenStore", L"Could not open \"%ls\" store.\nError code: %d", Store, GetLastError());
-		return ERROR_INVALID_HANDLE;
-	}
+    if (hStore == INVALID_HANDLE_VALUE)
+    {
+        debug(L"OpenStore", L"Could not open \"%ls\" store.\nError code: %d", Store, GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
-	hPartFirst = FindFirstPartition(hStore, &PartInfo);
-	
-	if ( hPartFirst == INVALID_HANDLE_VALUE ) {
-		debug(L"FindFirstPartition", L"Could not find first partition.\nError code: %d", GetLastError());
-		return ERROR_INVALID_HANDLE;
-	}
+    hPartFirst = FindFirstPartition(hStore, &PartInfo);
 
-	hPart = OpenPartition(hStore, PartInfo.szPartitionName);
+    if (hPartFirst == INVALID_HANDLE_VALUE)
+    {
+        debug(L"FindFirstPartition", L"Could not find first partition.\nError code: %d", GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
-	if ( hPart == INVALID_HANDLE_VALUE ) {
-		debug(L"OpenPartition", L"Could not open first partition store.\nError code: %d", GetLastError());
-		return ERROR_INVALID_HANDLE;
-	}
+    hPart = OpenPartition(hStore, PartInfo.szPartitionName);
 
-	if ( MountPartition(hPart) )
-		debug(L"MountPartition", L"Success!");
-	else
-		debug(L"MountPartition", L"Failed!");
+    if (hPart == INVALID_HANDLE_VALUE)
+    {
+        debug(L"OpenPartition", L"Could not open first partition store.\nError code: %d", GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
-	FreeLibrary(hlib);
+    if (MountPartition(hPart))
+        debug(L"MountPartition", L"Success!");
+    else
+        debug(L"MountPartition", L"Failed!");
 
-	return 0;
+    FreeLibrary(hlib);
+
+    return 0;
 }

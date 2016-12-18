@@ -14,14 +14,14 @@
 
 void debug(LPCTSTR title, LPCTSTR format, ...)
 {
-	TCHAR buffer[1024];
+    TCHAR buffer[1024];
 
-	va_list args;
-	va_start (args, format);
-	vswprintf(buffer, format, args);
-	va_end (args);
-	
-	MessageBox(NULL, (LPCTSTR)buffer, title, MB_OK|MB_TOPMOST);
+    va_list args;
+    va_start(args, format);
+    vswprintf(buffer, format, args);
+    va_end(args);
+
+    MessageBox(NULL, (LPCTSTR)buffer, title, MB_OK | MB_TOPMOST);
 }
 
 #endif
