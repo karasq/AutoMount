@@ -9,7 +9,7 @@ OBJ=$(subst $(SRC_DIR)/,$(OBJ_DIR)/,$(SRC:.cc=.o))
 INCS=-I./include
 CFLAGS=-O2 ${INCS} $(if $(DEBUG),-DDEBUG=1)
 CXXFLAGS=$(CFLAGS)
-LDFLAGS=
+LDFLAGS=-static -s
 
 ARCH=arm-mingw32ce
 CC=${ARCH}-gcc ${CFLAGS}

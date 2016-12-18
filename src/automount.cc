@@ -8,6 +8,7 @@
 */
 
 #include <cstdio>
+#include <tr1/memory>
 #include <windows.h>
 #include "coredll.h"
 #include "debug.h"
@@ -19,26 +20,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
     PARTINFO PartInfo = {0};
     PartInfo.cbSize = sizeof(PARTINFO);
 
-    HMODULE hlib = LoadLibrary(L"coredll.dll");
+    CoreDllPtr coreDll = CoreDll::load();
 
-    if (!hlib)
+    if (!coreDll->isLoaded())
     {
         debug(L"Coredll.dll", L"Could not open coredll.dll library.\nError code: %d", GetLastError());
         return ERROR_INVALID_HANDLE;
     }
 
-    OpenStoreProc OpenStore = (OpenStoreProc)GetProcAddress(hlib, L"OpenStore");
-    FindFirstPartitionProc FindFirstPartition = (FindFirstPartitionProc)GetProcAddress(hlib, L"FindFirstPartition");
-    OpenPartitionProc OpenPartition = (OpenPartitionProc)GetProcAddress(hlib, L"OpenPartition");
-    MountPartitionProc MountPartition = (MountPartitionProc)GetProcAddress(hlib, L"MountPartition");
-
-    if (!OpenStore || !FindFirstPartition || !MountPartition)
-    {
-        debug(L"Coredll.dll", L"Could not load functions from coredll.dll.\nError code: %d", GetLastError());
-        return ERROR_INVALID_HANDLE;
-    }
-
-    hStore = OpenStore(Store);
+    hStore = coreDll->OpenStore(Store);
 
     if (hStore == INVALID_HANDLE_VALUE)
     {
@@ -46,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
         return ERROR_INVALID_HANDLE;
     }
 
-    hPartFirst = FindFirstPartition(hStore, &PartInfo);
+    hPartFirst = coreDll->FindFirstPartition(hStore, &PartInfo);
 
     if (hPartFirst == INVALID_HANDLE_VALUE)
     {
@@ -54,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
         return ERROR_INVALID_HANDLE;
     }
 
-    hPart = OpenPartition(hStore, PartInfo.szPartitionName);
+    hPart = coreDll->OpenPartition(hStore, PartInfo.szPartitionName);
 
     if (hPart == INVALID_HANDLE_VALUE)
     {
@@ -62,12 +52,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
         return ERROR_INVALID_HANDLE;
     }
 
-    if (MountPartition(hPart))
+    if (coreDll->MountPartition(hPart))
         debug(L"MountPartition", L"Success!");
     else
         debug(L"MountPartition", L"Failed!");
-
-    FreeLibrary(hlib);
 
     return 0;
 }
