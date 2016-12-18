@@ -1,0 +1,28 @@
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName", ""
+         VALUE "FileVersion", "1.0 alpha"
+         VALUE "FileDescription", "Automount for WinCE 6.0"
+         VALUE "InternalName", "Automount"
+         VALUE "LegalCopyright", "Copyright 2016 Krystian Karaś"
+         VALUE "LegalTrademarks", ""
+         VALUE "OriginalFilename", "automount.exe"
+         VALUE "ProductName", "Automount"
+         VALUE "ProductVersion", "1.0 alpha"
+      }
+   }
+
+   BLOCK "VarFileInfo"
+   {
+      // 0x0415 = PL, 1200 = utf8
+      VALUE "Translation", 0x0415, 1200
+   }
+}
+
+AppIcon ICON "icon.ico"
