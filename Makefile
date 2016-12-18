@@ -1,7 +1,7 @@
 SRC_DIR=./src
 OBJ_DIR=./obj
 BIN_DIR=./bin
-BIN=$(BIN_DIR)/automount.exe
+BIN=$(BIN_DIR)/$(if $(DEBUG),automountdbg.exe,automount.exe)
 
 SRC=$(wildcard $(SRC_DIR)/*.cc)
 OBJ=$(subst $(SRC_DIR)/,$(OBJ_DIR)/,$(SRC:.cc=.o)) 
@@ -14,6 +14,7 @@ LDFLAGS=
 ARCH=arm-mingw32ce
 CC=${ARCH}-gcc ${CFLAGS}
 CXX=${ARCH}-g++
+MAKE=make
 WINDRES=${ARCH}-windres
 
 all: clean build
@@ -31,3 +32,7 @@ $(OBJ):
 
 clean:
 	rm -rf $(BIN) $(OBJ_DIR)/*.o
+
+test: 
+	${MAKE} DEBUG=1
+	
