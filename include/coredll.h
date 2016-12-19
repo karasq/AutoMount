@@ -27,15 +27,31 @@ class CoreDll
 
     // Store Manager functions from Windows CE coredll.dll library
     typedef HANDLE (WINAPI *OpenStoreProc)(LPCTSTR szDeviceName);
+    typedef BOOL (WINAPI *GetStoreInfoProc)(HANDLE hStore, PSTOREINFO pStoreInfo);
+    typedef HANDLE (WINAPI *FindFirstStoreProc)(PSTOREINFO pStoreInfo);
+    typedef BOOL (WINAPI *FindNextStoreProc)(HANDLE hSearch, PSTOREINFO pStoreInfo);
+    typedef BOOL (WINAPI *FindCloseStoreProc)(HANDLE hSearch);
     typedef HANDLE (WINAPI *FindFirstPartitionProc)(HANDLE hStore, PPARTINFO pPartInfo);
+    typedef BOOL (WINAPI *FindNextPartitionProc)(HANDLE hSearch, PPARTINFO pPartInfo);
+    typedef BOOL (WINAPI *FindClosePartitionProc)(HANDLE hSearch);
     typedef HANDLE (WINAPI *OpenPartitionProc)(HANDLE hStore, LPCTSTR szPartitionName);
+    typedef BOOL (WINAPI *GetPartitionInfoProc)(HANDLE hPartition, PPARTINFO pPartInfo);
     typedef BOOL (WINAPI *MountPartitionProc)(HANDLE hPartition);
+    typedef WINBASEAPI BOOL (*CeGetVolumeInfoProc)(IN LPCWSTR pszRootPath, IN CE_VOLUME_INFO_LEVEL InfoLevel, OUT LPCE_VOLUME_INFO lpVolumeInfo);
 
     // Imported functions
     OpenStoreProc OpenStore;
+    GetStoreInfoProc GetStoreInfo;
+    FindFirstStoreProc FindFirstStore;
+    FindNextStoreProc FindNextStore;
+    FindCloseStoreProc FindCloseStore;
     FindFirstPartitionProc FindFirstPartition;
+    FindNextPartitionProc FindNextPartition;
+    FindClosePartitionProc FindClosePartition;
     OpenPartitionProc OpenPartition;
+    GetPartitionInfoProc GetPartitionInfo;
     MountPartitionProc MountPartition;
+    CeGetVolumeInfoProc CeGetVolumeInfo;
 
     // Class functions
     static shared_ptr load();
@@ -43,6 +59,7 @@ class CoreDll
     bool isLoaded() { 
         return m_isLoaded; 
     }
+
   private:
     // Single instance of this class
     static shared_ptr m_instance;

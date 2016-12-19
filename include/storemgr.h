@@ -65,6 +65,21 @@
 #define STORAGE_DEVICE_FLAG_MEDIASENSE     (1 << 3)  // Device requires media sense calls
 #define STORAGE_DEVICE_FLAG_XIP            (1 << 4)
 
+/* Volume attributes */
+#define CE_VOLUME_ATTRIBUTE_READONLY                0x1
+#define CE_VOLUME_ATTRIBUTE_HIDDEN                  0x2
+#define CE_VOLUME_ATTRIBUTE_REMOVABLE               0x4
+#define CE_VOLUME_ATTRIBUTE_SYSTEM                  0x8
+#define CE_VOLUME_ATTRIBUTE_BOOT                    0x10
+
+/* Volume flags */
+#define CE_VOLUME_TRANSACTION_SAFE                  0x1     // Performs transaction safe operations
+#define CE_VOLUME_FLAG_TRANSACT_WRITE               0x2
+#define CE_VOLUME_FLAG_WFSC_SUPPORTED               0x4
+#define CE_VOLUME_FLAG_LOCKFILE_SUPPORTED           0x8
+#define CE_VOLUME_FLAG_NETWORK                      0x10
+#define CE_VOLUME_FLAG_STORE                        0x20
+
 // Type definitions
 typedef ULONGLONG SECTORNUM;
 
@@ -111,5 +126,19 @@ typedef struct tagPARTINFO
     DWORD     dwAttributes;                         // partition attributes, see below   
     BYTE      bPartType;                  
 } PARTINFO, *PPARTINFO;
+
+/* information about volume */
+typedef struct _CE_VOLUME_INFO {
+    DWORD cbSize;
+    DWORD dwAttributes;
+    DWORD dwFlags;
+    DWORD dwBlockSize;
+    TCHAR szStoreName[STORENAMESIZE];
+    TCHAR szPartitionName[PARTITIONNAMESIZE];
+} CE_VOLUME_INFO, *PCE_VOLUME_INFO, *LPCE_VOLUME_INFO;
+
+typedef enum _CE_VOLUME_INFO_LEVEL {
+    CeVolumeInfoLevelStandard,
+} CE_VOLUME_INFO_LEVEL;
 
 #endif

@@ -8,18 +8,12 @@
 */
 
 #include <cstdio>
-#include <tr1/memory>
 #include <windows.h>
 #include "coredll.h"
 #include "debug.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd)
 {
-    HANDLE hStore, hPartFirst, hPart;
-    LPCTSTR Store = L"DSK2:";
-    PARTINFO PartInfo = {0};
-    PartInfo.cbSize = sizeof(PARTINFO);
-
     CoreDllPtr coreDll = CoreDll::load();
 
     if (!coreDll->isLoaded())
@@ -28,34 +22,79 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
         return ERROR_INVALID_HANDLE;
     }
 
-    hStore = coreDll->OpenStore(Store);
+    STOREINFO stInfo = {0};
+    stInfo.cbSize = sizeof(STOREINFO);
 
-    if (hStore == INVALID_HANDLE_VALUE)
+    HANDLE hStoreSearch = coreDll->FindFirstStore(&stInfo);
+
+    if (hStoreSearch != INVALID_HANDLE_VALUE)
     {
-        debug(L"OpenStore", L"Could not open \"%ls\" store.\nError code: %d", Store, GetLastError());
-        return ERROR_INVALID_HANDLE;
+        // Iterate through all stores
+        do
+        {
+            debugStore(L"Found Store", &stInfo);
+
+            HANDLE hStore = coreDll->OpenStore(stInfo.szDeviceName);
+
+            if (hStore == INVALID_HANDLE_VALUE)
+            {
+                debug(L"OpenStore", L"Could not open store %ls.\nError code: %d", stInfo.szDeviceName, GetLastError());
+                continue;
+            }
+
+            PARTINFO partInfo = {0};
+            partInfo.cbSize = sizeof(PARTINFO);
+
+            HANDLE hPartSearch = coreDll->FindFirstPartition(hStore, &partInfo);
+
+            if (hPartSearch == INVALID_HANDLE_VALUE)
+            {
+                debug(L"FindFirstPartition", L"Could not find first partition.\nError code: %d", stInfo.szDeviceName, GetLastError());
+                continue;
+            }
+
+            // Iterate through all partitions
+            do
+            {
+                if (partInfo.dwAttributes & PARTITION_ATTRIBUTE_MOUNTED) // skip mounted
+                    continue;
+                if (wcslen(partInfo.szFileSys) == 0) // skip uknown file system
+                    continue;
+
+                CE_VOLUME_INFO volInfo = {0};
+                volInfo.cbSize = sizeof(CE_VOLUME_INFO);
+
+                BOOL volResult = coreDll->CeGetVolumeInfo(partInfo.szVolumeName, CeVolumeInfoLevelStandard, &volInfo);
+
+                if (volResult && (volInfo.dwAttributes & CE_VOLUME_ATTRIBUTE_HIDDEN)) // skip hidden
+                    continue;
+                
+                debugPartition(L"Found Partition", &partInfo, &volInfo);
+
+                HANDLE hPart = coreDll->OpenPartition(hStore, partInfo.szPartitionName);
+
+                if (hPart == INVALID_HANDLE_VALUE)
+                {
+                    debug(L"OpenPartition", L"Could not open partition %ls.\nError code: %d", partInfo.szPartitionName, GetLastError());
+                    continue;
+                }
+
+                if (coreDll->MountPartition(hPart))
+                    debug(L"MountPartition", L"Success! Partition %ls has been mounted.", partInfo.szPartitionName);
+                else
+                    debug(L"MountPartition", L"Failed! Partition %ls could not be mounted.\nErro code: %d", partInfo.szPartitionName, GetLastError());
+            } while (coreDll->FindNextPartition(hPartSearch, &partInfo));
+
+            coreDll->FindClosePartition(hPartSearch);
+        } while (coreDll->FindNextStore(hStoreSearch, &stInfo));
+
+        coreDll->FindCloseStore(hStoreSearch);
     }
-
-    hPartFirst = coreDll->FindFirstPartition(hStore, &PartInfo);
-
-    if (hPartFirst == INVALID_HANDLE_VALUE)
-    {
-        debug(L"FindFirstPartition", L"Could not find first partition.\nError code: %d", GetLastError());
-        return ERROR_INVALID_HANDLE;
-    }
-
-    hPart = coreDll->OpenPartition(hStore, PartInfo.szPartitionName);
-
-    if (hPart == INVALID_HANDLE_VALUE)
-    {
-        debug(L"OpenPartition", L"Could not open first partition store.\nError code: %d", GetLastError());
-        return ERROR_INVALID_HANDLE;
-    }
-
-    if (coreDll->MountPartition(hPart))
-        debug(L"MountPartition", L"Success!");
     else
-        debug(L"MountPartition", L"Failed!");
+    {
+        debug(L"FindFirstStore", L"Could not find first store.\nError code: %d", GetLastError());
+        return ERROR_INVALID_HANDLE;
+    }
 
     return 0;
 }

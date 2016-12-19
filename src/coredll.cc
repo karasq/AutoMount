@@ -15,8 +15,15 @@ CoreDll::shared_ptr CoreDll::m_instance;
 
 CoreDll::CoreDll() : 
     OpenStore(false),
+    GetStoreInfo(false),
+    FindFirstStore(false),
+    FindCloseStore(false),
+    FindNextStore(false),
     FindFirstPartition(false),
+    FindNextPartition(false),
+    FindClosePartition(false),
     OpenPartition(false),
+    GetPartitionInfo(false),
     MountPartition(false),
     m_isLoaded(false)
 {
@@ -25,13 +32,24 @@ CoreDll::CoreDll() :
     if (!m_hDll) {
         return;
     }
-    
-    OpenStore = reinterpret_cast<OpenStoreProc>(GetProcAddress(m_hDll, L"OpenStore"));
-    FindFirstPartition = reinterpret_cast<FindFirstPartitionProc>(GetProcAddress(m_hDll, L"FindFirstPartition"));
-    OpenPartition = reinterpret_cast<OpenPartitionProc>(GetProcAddress(m_hDll, L"OpenPartition"));
-    MountPartition = reinterpret_cast<MountPartitionProc>(GetProcAddress(m_hDll, L"MountPartition"));
 
-    if (!OpenStore || !FindFirstPartition || !OpenPartition || !MountPartition) {
+    OpenStore = reinterpret_cast<OpenStoreProc>(GetProcAddress(m_hDll, L"OpenStore"));
+    GetStoreInfo = reinterpret_cast<GetStoreInfoProc>(GetProcAddress(m_hDll, L"GetStoreInfo"));
+    FindFirstStore = reinterpret_cast<FindFirstStoreProc>(GetProcAddress(m_hDll, L"FindFirstStore"));
+    FindNextStore = reinterpret_cast<FindNextStoreProc>(GetProcAddress(m_hDll, L"FindNextStore"));
+    FindCloseStore = reinterpret_cast<FindCloseStoreProc>(GetProcAddress(m_hDll, L"FindCloseStore"));
+    FindFirstPartition = reinterpret_cast<FindFirstPartitionProc>(GetProcAddress(m_hDll, L"FindFirstPartition"));
+    FindNextPartition = reinterpret_cast<FindNextPartitionProc>(GetProcAddress(m_hDll, L"FindNextPartition"));
+    FindClosePartition = reinterpret_cast<FindClosePartitionProc>(GetProcAddress(m_hDll, L"FindClosePartition"));
+    OpenPartition = reinterpret_cast<OpenPartitionProc>(GetProcAddress(m_hDll, L"OpenPartition"));
+    GetPartitionInfo = reinterpret_cast<GetPartitionInfoProc>(GetProcAddress(m_hDll, L"GetPartitionInfo"));
+    MountPartition = reinterpret_cast<MountPartitionProc>(GetProcAddress(m_hDll, L"MountPartition"));
+    CeGetVolumeInfo = reinterpret_cast<CeGetVolumeInfoProc>(GetProcAddress(m_hDll, L"CeGetVolumeInfoW"));
+
+    if (!OpenStore || !GetStoreInfo || !FindFirstStore || 
+        !FindNextStore || !FindCloseStore  || !FindFirstPartition || !FindNextPartition || 
+        !FindClosePartition || !OpenPartition || !GetPartitionInfo || !MountPartition || !CeGetVolumeInfo) 
+    {
         m_isLoaded = false;
     } else {
         m_isLoaded = true;

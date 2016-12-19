@@ -7,14 +7,14 @@ PRODUCTVERSION 1,0,0,0
       BLOCK "040904E4"
       {
          VALUE "CompanyName", ""
-         VALUE "FileVersion", "1.0 alpha"
+         VALUE "FileVersion", "1.0"
          VALUE "FileDescription", "Automount for WinCE 6.0"
          VALUE "InternalName", "Automount"
-         VALUE "LegalCopyright", "Copyright 2016 Krystian Karaś"
+         VALUE "LegalCopyright", "Copyright 2016 Krystian Karas"
          VALUE "LegalTrademarks", ""
          VALUE "OriginalFilename", "automount.exe"
          VALUE "ProductName", "Automount"
-         VALUE "ProductVersion", "1.0 alpha"
+         VALUE "ProductVersion", "1.0"
       }
    }
 
