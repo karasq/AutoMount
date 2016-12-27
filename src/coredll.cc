@@ -8,7 +8,6 @@
 */
 
 #include "coredll.h"
-//#include "debug.h"
 
 // Initalisation of static CoreDll members
 CoreDll::shared_ptr CoreDll::m_instance;

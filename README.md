@@ -7,12 +7,16 @@ In that case you need to physically take out you card from memory slot and put i
 
 This application try to solve this problem by mouting partitions programmatically.
 
-## How does it work? ##
+## How does it work?
 It simply scans your system looking for unmouted partitions and try to mount them all (SD card partition will be the
 only one in most cases). Hidden partitions and unknown file system partitions will be omited.
 
-## How to use it? ##
+## How to use it?
 It depends on your needs. Basically you need to somehow run the application on your device. 
 You can try to configure your device to run AutoMount on booting process, so you will be able 
 to access SD card partition from any application right after this process. Or you can run it 
 on-demand e.g. through MortScript only when you need it.
+
+## How to compile it?
+To compile the source code cross compiler for Windows CE from 
+[CeGCC project](http://cegcc.sourceforge.net/) was used. 
